@@ -43,11 +43,20 @@ def putMemoryStore[I <: Int](ix: I, v: Int): GradedMemoryState[I, Unit] = Graded
 })
 
 /**
+ *
+ * scala> val (x, s) = sampleGetPuts(MemoryStore.empty)
+ * val s: MemoryStore[Int(1) | Int(20) | Int(5)] = MemoryStore(<function1>)
+ * val x: Option[Int] = None
+ * scala> s(1)
+ * Some(10)
+ * scala> s(5)
+ * Some(8)
+ *
+ */
 def sampleGetPuts: GradedMemoryState[1 | 20 | 5, Option[Int]] =
-  for (
-    () <- putMemoryStore[1](1, 10);
-    x <- getMemoryStore[5](5);
-    () <- putMemoryStore[20](20, 3);
-    () <- putMemoryStore[5](5, 8)
-  ) yield x
-*/
+  for {
+    _ <- putMemoryStore[1 | 20 | 5](1, 10)
+    x <- getMemoryStore[20 | 5](5)
+    _ <- putMemoryStore[20 | 5](20, 3)
+    _ <- putMemoryStore[5](5, 8)
+  } yield x

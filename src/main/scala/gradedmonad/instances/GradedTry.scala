@@ -7,6 +7,10 @@ enum GradedTry[B, S[_ <: B], E <: B, X] {
 }
 
 object GradedTry {
+  def gradedPure[B, S[_ <: B], X](x: X)(
+    implicit tc: GradedMonad[B, [E <: B, X] => GradedTry[B, S, E, X]]
+  ): GradedTry[B, S, Nothing, X] = tc.gradedPure(x)
+
   trait ToGradedTryOps {
     implicit def gradedTryFunctorOps[B, S[_ <: B], E <: B]: Functor[[X] => GradedTry[B, S, E, X]] = new Functor {
       type T[X] = GradedTry[B, S, E, X]

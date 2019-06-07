@@ -10,6 +10,10 @@ trait GradedStateMapping[B, S[_ <: B], E <: B, X] {
 }
 
 object GradedState {
+  def gradedPure[B, S[_ <: B], X](x: X)(
+    implicit tc: GradedMonad[B, [E <: B, X] => GradedState[B, S, E, X]]
+  ): GradedState[B, S, Nothing, X] = tc.gradedPure(x)
+
   trait ToGradedStateOps {
     implicit def gradedStateOps[B, S[_ <: B]](
       implicit effectUpcast: EffectUpcast[B, S]
