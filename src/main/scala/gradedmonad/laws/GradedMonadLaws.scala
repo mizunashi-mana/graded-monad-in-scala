@@ -4,7 +4,7 @@ package laws
 import gradedmonad._
 import gradedmonad.implicits._
 
-trait GradedMonadLaws[B, T[_, _]] {
+trait GradedMonadLaws[B, T[_ <: B, _]] {
   implicit def T: GradedMonad[B, T]
 
   def gradedMonadIdentity[E <: B, X](m: T[E, X]): IsEq[T[E, X]] =

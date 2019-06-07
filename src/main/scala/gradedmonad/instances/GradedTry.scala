@@ -12,21 +12,19 @@ object GradedTry {
   ): GradedTry[B, S, Nothing, X] = tc.gradedPure(x)
 
   trait ToGradedTryOps {
-    implicit def gradedTryFunctorOps[B, S[_ <: B], E <: B]: Functor[[X] => GradedTry[B, S, E, X]] = new Functor {
-      type T[X] = GradedTry[B, S, E, X]
-
-      def map[X, Y](m: T[X])(f: X => Y): T[Y] = m match {
-        case GradedSuccess(x) => GradedSuccess(f(x))
-        case GradedFailure(e) => GradedFailure(e)
-      }
-    }
-
     implicit def gradedTryOps[B, S[_ <: B]](
       implicit effectUpcast: EffectUpcast[B, S]
     ): GradedMonad[B, [E <: B, X] => GradedTry[B, S, E, X]] = new GradedMonad {
       type T[E <: B, X] = GradedTry[B, S, E, X]
 
-      def pfunctor[E <: B]: Functor[[X] => T[E, X]] = gradedTryFunctorOps
+      def pfunctor[E <: B]: Functor[[X] => T[E, X]] = new Functor {
+        type T[X] = GradedTry[B, S, E, X]
+
+        def map[X, Y](m: T[X])(f: X => Y): T[Y] = m match {
+          case GradedSuccess(x) => GradedSuccess(f(x))
+          case GradedFailure(e) => GradedFailure(e)
+        }
+      }
 
       def gradedUpcast[E1 <: B, E2 <: B, X](m: T[E1, X]): T[E1 | E2, X] = m match {
         case GradedSuccess(x) => GradedSuccess(x)
